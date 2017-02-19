@@ -86,7 +86,13 @@ public class SearchUtils {
 		{
 			Coordinates cordinates = ((Locatable)element).getCoordinates();
 			cordinates.inViewPort();
-			element.click();
+			if(!element.isDisplayed()) {
+				WebDriverWait wait = new WebDriverWait(driver, 20);
+				wait.until(ExpectedConditions.visibilityOf(element));
+				driver.findElement(By.id(element.getAttribute("id"))).click();
+			} else {
+				element.click();
+			}
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -105,7 +111,7 @@ public class SearchUtils {
 		return element;
 	}
 
-// TODO : Trying to use FluentWait but couldn't fully complete to work.
+// TODO : Tried to use FluentWait but couldn't fully complete to work.
 	public Wait<WebDriver> getWait(final WebDriver driver) {
 		// 30 seconds to wait
 		Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)

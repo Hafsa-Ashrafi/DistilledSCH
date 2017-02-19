@@ -6,6 +6,8 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,11 +44,13 @@ public class SearchRentalPropertyTest extends SearchUtils {
 	//Search Ranges
 	private final static Table<String, Range<Integer>, Boolean> QUERY_CONSTANTS = HashBasedTable.create();
 	static {
-		QUERY_CONSTANTS.put(bedrooms, Range.openClosed(1, 3), true);
-		QUERY_CONSTANTS.put(bathrooms, Range.openClosed(1, 2), true);
-		QUERY_CONSTANTS.put(price, Range.openClosed(800, 1200), true);
+		QUERY_CONSTANTS.put(bedrooms, Range.closed(1, 3), true);
+		QUERY_CONSTANTS.put(bathrooms, Range.closed(1, 2), true);
+		QUERY_CONSTANTS.put(price, Range.closed(800, 1200), true);
 	}
 
+	final static Logger logger = Logger.getLogger(SearchRentalPropertyTest.class);
+	
 	private WebDriver driver;
 
 	/* Launch Daft.ie
@@ -62,66 +66,87 @@ public class SearchRentalPropertyTest extends SearchUtils {
 	public void setAndRunSearchQuery() throws Exception
 	{
 		try {
+			PropertyConfigurator.configure("log4j2.properties");
 
 			driver = getDriverType();
-
+			logger.info("driver" + driver.getTitle());
+			
 			//driver Customizations
 			driver.manage().window().maximize();
 
 			//Launch the URL
+			logger.info("Connecting to url" + URL);
 			driver.get(URL);
-
+			
 			//Click on To Rent Link
+			logger.info("searchType" + searchType);
 			List<WebElement> toRentLink =  driver.findElements(By.linkText(searchType));
 			toRentLink.get(1).click();
 
 			//Select City
+			logger.info("Select City" + cityToSelect);
 			driver.findElement(By.className("jcf-select-text")).click();
 			WebElement cityDropdown = driver.findElement(By.className("jcf-select-drop-content"));
-			selectElementFromDropdownAndClick(driver, cityDropdown, cityToSelect);    
+			selectElementFromDropdownAndClick(driver, cityDropdown, cityToSelect);
 
 			//Select Area in City
+			logger.info("Select area" + 342);
 			wait(driver, By.xpath(".//div[@id='choose-an-area']")).click();
-			scrollToElementAndClick(driver, driver.findElement(By.id("328")));
+			Thread.sleep(3000);
+			driver.findElement(By.id("342")).click();
 
 			//Run a Search
+			logger.info("searching....");
 			driver.findElement(By.xpath("//button[contains(text(),'Search')]")).click();
-
+			
 			//Click Advanced Search link
+			logger.info("advance searching....");
 			wait(driver, By.xpath(".//form[@class='search-form']//a")).click();
 
 			//Set Price Range
 			//Set Min price
 			WebElement minPriceElement = wait(driver, By.xpath(".//dl[@id='min_price']"));
 			scrollToElementAndClick(driver, minPriceElement);
-			selectElementFromDropdownAndClick(driver, minPriceElement, currency+getRange(price).lowerEndpoint().toString());
+			final String minPrice = currency+getRange(price).lowerEndpoint().toString();
+			logger.info("min price" + minPrice);
+			selectElementFromDropdownAndClick(driver, minPriceElement, minPrice);
 
 			//Set Max Price
 			WebElement maxPriceElement = driver.findElement(By.xpath(".//dl[@id='max_price']"));
 			scrollToElementAndClick(driver, maxPriceElement);
-			selectElementFromDropdownAndClick(driver, maxPriceElement, currency+getRange(price).upperEndpoint().toString());
+			final String maxPrice = currency+getRange(price).upperEndpoint().toString();
+			logger.info("max price" + maxPrice);
+			selectElementFromDropdownAndClick(driver, maxPriceElement, maxPrice);
 
 			//Beds range
 			//Min beds
 			WebElement minBedDropdownElement = driver.findElement(By.xpath(".//dl[@id='min_bed']"));
-			scrollToElementAndClick(driver, minBedDropdownElement);      
-			selectElementFromDropdownAndClick(driver, minBedDropdownElement, getRange(bedrooms).lowerEndpoint().toString()+bedrooms);
+			scrollToElementAndClick(driver, minBedDropdownElement);
+			String minBedrooms = get(getRange(bedrooms).lowerEndpoint(), bedrooms);
+			logger.info("min beds" + minBedrooms);
+			selectElementFromDropdownAndClick(driver, minBedDropdownElement, minBedrooms);
 
 			// Max Beds
 			WebElement maxBedDropdownElement = driver.findElement(By.xpath(".//dl[@id='max_bed']"));
 			maxBedDropdownElement.click();
-			selectElementFromDropdownAndClick(driver, maxBedDropdownElement, getRange(bedrooms).upperEndpoint().toString()+bedrooms);
+			String maxBedrooms = get(getRange(bedrooms).upperEndpoint(), bedrooms);
+			logger.info("max beds" + maxBedrooms);
+			selectElementFromDropdownAndClick(driver, maxBedDropdownElement, maxBedrooms);
 
 			//Bathrooms range
 			//Min Baths
 			WebElement minBathDropdown = driver.findElement(By.xpath(".//dl[@id='min_bath']"));
 			scrollToElementAndClick(driver, minBathDropdown);
-			selectElementFromDropdownAndClick(driver, minBathDropdown, getRange(bathrooms).lowerEndpoint().toString()+bathrooms);
+			String minBathrooms = get(getRange(bathrooms).lowerEndpoint(), bathrooms);
+			logger.info("min Bathrooms" + minBathrooms);
+			selectElementFromDropdownAndClick(driver, minBathDropdown, minBathrooms);
 
 			//Max Baths
 			WebElement maxBathDropdown = driver.findElement(By.xpath(".//dl[@id='max_bath']"));
 			maxBathDropdown.click();
-			selectElementFromDropdownAndClick(driver, maxBathDropdown, getRange(bathrooms).upperEndpoint().toString()+bathrooms);
+			String maxBathrooms = get(getRange(bathrooms).upperEndpoint(), bathrooms);
+			logger.info("max bathrooms" + maxBathrooms);
+			selectElementFromDropdownAndClick(driver, maxBathDropdown, maxBathrooms);
 
 			//Select Property Type
 			scrollToElementAndClick(driver, driver.findElement(By.id("multi_title_container_ptId")));
@@ -130,12 +155,14 @@ public class SearchRentalPropertyTest extends SearchUtils {
 			List<WebElement> list = propertyTypeDropdown.findElements(By.tagName("li"));
 			for (WebElement eachElement : list) {
 				if(eachElement.findElement(By.xpath(".//label/span")).getText().equalsIgnoreCase(propertyTypeApartment)) {
+					logger.info("property type" + propertyTypeApartment);
 					eachElement.findElement(By.xpath(".//label")).click();
 					break;
 				}
 			}
 
 			//Run a Search
+			logger.info("Running advanced search");
 			scrollToElementAndClick(driver, driver.findElement(By.xpath(".//input[@class='btn-search']")));
 		} catch(Exception e) {
 			throw(e);
@@ -148,38 +175,44 @@ public class SearchRentalPropertyTest extends SearchUtils {
 	 * */
 	@Test
 	public void validateSearchResults() throws Exception {
+		logger.info("start of result validation");
 		WebElement resultTable = wait(driver, By.xpath(".//div[@class='box']"));
 		if(resultTable.isDisplayed()) {
+			logger.info("Got the result and it is not empty");
 			WebElement propertyBox = resultTable.findElement(By.xpath(".//ul[@class='info']"));
 			List<WebElement> criteriaList = propertyBox.findElements(By.tagName("li"));
 
 			//Assert Property Type
 			assertTrue(criteriaList.get(0).getText().replaceFirst("\\|", "").equalsIgnoreCase(propertyTypeApartment));
-
+			logger.info("Passed Property Type assertion");
+			
 			//Assert No of Bedrooms
 			String noOfBedString = criteriaList.get(1).getText().replaceFirst("\\|", "");
-			assertEquals(true, assertResult(noOfBedString, "Beds", bedrooms));
-
+			assertEquals(true, assertResult(noOfBedString, "Bed", bedrooms));
+			logger.info("Passed bedrooms assertion");
+			
 			//Assert No of Bathrooms
 			String noOfBathsString = criteriaList.get(2).getText().replaceFirst("\\|", "");
-			assertEquals(true, assertResult(noOfBathsString, "Baths", bathrooms));
-
+			assertEquals(true, assertResult(noOfBathsString, "Bath", bathrooms));
+			logger.info("Passed bathrooms assertion");
+			
 			//Assert Price
 			String priceString = resultTable.findElement(By.className("price")).getText();
 			String priceStrip = priceString.substring(priceString.indexOf(currency)+1, priceString.indexOf(" "));
 			int housePrice = Integer.parseInt(priceStrip.replaceAll(",", ""));
 			assertEquals(true, isInRange(price, housePrice));
+			logger.info("Passed price assertion");
 
-			// Print a Log In message to the screen
-			System.out.println("Test was Successfully");
+			logger.info("Test was Successfully");
 		} else {
-			System.out.println("No Results found");
+			logger.info("Empty Result");
 		}
 	}
 
 	// Close the browser
 	@After
 	public void closeBrowsers() throws InterruptedException  {
+		logger.info("Closing browser");
 		driver.quit();
 	}
 
@@ -222,5 +255,15 @@ public class SearchRentalPropertyTest extends SearchUtils {
 			return ranges.getKey();
 		}
 		return null;
+	}
+	
+	private String get(int num, String type) {
+		String maxBedrooms = Integer.toString(num);
+		if(num == 1) {
+			maxBedrooms = maxBedrooms+type.substring(0, type.length()-1);
+		} else {
+			maxBedrooms = maxBedrooms+type;
+		}
+		return maxBedrooms;
 	}
 }
