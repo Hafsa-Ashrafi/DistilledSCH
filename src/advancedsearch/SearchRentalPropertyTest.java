@@ -50,7 +50,7 @@ public class SearchRentalPropertyTest extends SearchUtils {
 	}
 
 	final static Logger logger = Logger.getLogger(SearchRentalPropertyTest.class);
-	
+
 	private WebDriver driver;
 
 	/* Launch Daft.ie
@@ -70,14 +70,14 @@ public class SearchRentalPropertyTest extends SearchUtils {
 
 			driver = getDriverType();
 			logger.info("driver" + driver.getTitle());
-			
+
 			//driver Customizations
 			driver.manage().window().maximize();
 
 			//Launch the URL
 			logger.info("Connecting to url" + URL);
 			driver.get(URL);
-			
+
 			//Click on To Rent Link
 			logger.info("searchType" + searchType);
 			List<WebElement> toRentLink =  driver.findElements(By.linkText(searchType));
@@ -98,7 +98,7 @@ public class SearchRentalPropertyTest extends SearchUtils {
 			//Run a Search
 			logger.info("searching....");
 			driver.findElement(By.xpath("//button[contains(text(),'Search')]")).click();
-			
+
 			//Click Advanced Search link
 			logger.info("advance searching....");
 			wait(driver, By.xpath(".//form[@class='search-form']//a")).click();
@@ -122,14 +122,14 @@ public class SearchRentalPropertyTest extends SearchUtils {
 			//Min beds
 			WebElement minBedDropdownElement = driver.findElement(By.xpath(".//dl[@id='min_bed']"));
 			scrollToElementAndClick(driver, minBedDropdownElement);
-			String minBedrooms = get(getRange(bedrooms).lowerEndpoint(), bedrooms);
+			String minBedrooms = getSingularOrPlural(getRange(bedrooms).lowerEndpoint(), bedrooms);
 			logger.info("min beds" + minBedrooms);
 			selectElementFromDropdownAndClick(driver, minBedDropdownElement, minBedrooms);
 
 			// Max Beds
 			WebElement maxBedDropdownElement = driver.findElement(By.xpath(".//dl[@id='max_bed']"));
 			maxBedDropdownElement.click();
-			String maxBedrooms = get(getRange(bedrooms).upperEndpoint(), bedrooms);
+			String maxBedrooms = getSingularOrPlural(getRange(bedrooms).upperEndpoint(), bedrooms);
 			logger.info("max beds" + maxBedrooms);
 			selectElementFromDropdownAndClick(driver, maxBedDropdownElement, maxBedrooms);
 
@@ -137,14 +137,14 @@ public class SearchRentalPropertyTest extends SearchUtils {
 			//Min Baths
 			WebElement minBathDropdown = driver.findElement(By.xpath(".//dl[@id='min_bath']"));
 			scrollToElementAndClick(driver, minBathDropdown);
-			String minBathrooms = get(getRange(bathrooms).lowerEndpoint(), bathrooms);
+			String minBathrooms = getSingularOrPlural(getRange(bathrooms).lowerEndpoint(), bathrooms);
 			logger.info("min Bathrooms" + minBathrooms);
 			selectElementFromDropdownAndClick(driver, minBathDropdown, minBathrooms);
 
 			//Max Baths
 			WebElement maxBathDropdown = driver.findElement(By.xpath(".//dl[@id='max_bath']"));
 			maxBathDropdown.click();
-			String maxBathrooms = get(getRange(bathrooms).upperEndpoint(), bathrooms);
+			String maxBathrooms = getSingularOrPlural(getRange(bathrooms).upperEndpoint(), bathrooms);
 			logger.info("max bathrooms" + maxBathrooms);
 			selectElementFromDropdownAndClick(driver, maxBathDropdown, maxBathrooms);
 
@@ -185,17 +185,17 @@ public class SearchRentalPropertyTest extends SearchUtils {
 			//Assert Property Type
 			assertTrue(criteriaList.get(0).getText().replaceFirst("\\|", "").equalsIgnoreCase(propertyTypeApartment));
 			logger.info("Passed Property Type assertion");
-			
+
 			//Assert No of Bedrooms
 			String noOfBedString = criteriaList.get(1).getText().replaceFirst("\\|", "");
 			assertEquals(true, assertResult(noOfBedString, "Bed", bedrooms));
 			logger.info("Passed bedrooms assertion");
-			
+
 			//Assert No of Bathrooms
 			String noOfBathsString = criteriaList.get(2).getText().replaceFirst("\\|", "");
 			assertEquals(true, assertResult(noOfBathsString, "Bath", bathrooms));
 			logger.info("Passed bathrooms assertion");
-			
+
 			//Assert Price
 			String priceString = resultTable.findElement(By.className("price")).getText();
 			String priceStrip = priceString.substring(priceString.indexOf(currency)+1, priceString.indexOf(" "));
@@ -257,7 +257,12 @@ public class SearchRentalPropertyTest extends SearchUtils {
 		return null;
 	}
 	
-	private String get(int num, String type) {
+	/* This method will return the range set
+	 * @param num
+	 * @param type
+	 * returns string Eg. Bedroom/Bedrooms
+	 */
+	private String getSingularOrPlural(int num, String type) {
 		String maxBedrooms = Integer.toString(num);
 		if(num == 1) {
 			maxBedrooms = maxBedrooms+type.substring(0, type.length()-1);
