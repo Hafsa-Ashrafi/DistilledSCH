@@ -16,6 +16,7 @@ Execution Environment: JavaSE-1.8
 **Drivers**
 
 The Drivers are Included in the Dependencies folder for cross browser Testing. /DistilledSCH/Dependencies
+
 Geckodriver - Firefox driver (for FF > v48), supported with Selenium >= v3
 
 ChromeDriver
