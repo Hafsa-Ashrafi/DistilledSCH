@@ -90,9 +90,9 @@ public class SearchRentalPropertyTest extends SearchUtils {
 			selectElementFromDropdownAndClick(driver, cityDropdown, cityToSelect);
 
 			//Select Area in City
-			logger.info("Select area" + 342);
+			logger.info("Select area with id " + 342);
+			Thread.sleep(2000);
 			wait(driver, By.xpath(".//div[@id='choose-an-area']")).click();
-			Thread.sleep(3000);
 			driver.findElement(By.id("342")).click();
 
 			//Run a Search
