@@ -1,6 +1,10 @@
 # DistilledSCH
 Distilled SCH Assesment1- Automate Search for Daft.ie Website
 
+**Assesment**
+
+https://github.com/Hafsa-Ashrafi/DistilledSCH/blob/master/DistilledSCH_QA_Automation_Engineer_Tech_Test_001.pdf
+
 Tools,frameworks and Language: (Selenium 3.0.1 ,junit,log4j with Java)
 
 IDE: Eclipse.
