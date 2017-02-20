@@ -256,19 +256,4 @@ public class SearchRentalPropertyTest extends SearchUtils {
 		}
 		return null;
 	}
-	
-	/* This method will return the range set
-	 * @param num
-	 * @param type
-	 * returns string Eg. Bedroom/Bedrooms
-	 */
-	private String getSingularOrPlural(int num, String type) {
-		String maxBedrooms = Integer.toString(num);
-		if(num == 1) {
-			maxBedrooms = maxBedrooms+type.substring(0, type.length()-1);
-		} else {
-			maxBedrooms = maxBedrooms+type;
-		}
-		return maxBedrooms;
-	}
 }

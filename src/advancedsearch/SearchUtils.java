@@ -27,14 +27,14 @@ public class SearchUtils {
 	/* This will return assigned web driver type from properties file
 	 * return driver
 	 * */
-	public WebDriver getDriverType() throws IOException{
-		InputStream input = SearchUtils.class.getClassLoader().getResourceAsStream("data/config.properties");
-		Properties prop = new Properties();
+	public final WebDriver getDriverType() throws IOException{
+		final InputStream input = SearchUtils.class.getClassLoader().getResourceAsStream("data/config.properties");
+		final Properties prop = new Properties();
 		prop.load(input);
-		StringBuilder driverPath = new StringBuilder();
+		final StringBuilder driverPath = new StringBuilder();
 		driverPath.append(System.getProperty("user.dir"));
 		driverPath.append(prop.getProperty("driverpath"));
-		String browserType = prop.getProperty("browser");
+		final String browserType = prop.getProperty("browser");
 		WebDriver driver;
 
 		if (browserType=="chrome")
@@ -98,20 +98,36 @@ public class SearchUtils {
 		}
 	}
 
+
+	/* This method will return the range set
+	 * @param num
+	 * @param type
+	 * returns string Eg. Bedroom/Bedrooms
+	 */
+	public String getSingularOrPlural(int num, String type) {
+		String maxBedrooms = Integer.toString(num);
+		if(num == 1) {
+			maxBedrooms = maxBedrooms+type.substring(0, type.length()-1);
+		} else {
+			maxBedrooms = maxBedrooms+type;
+		}
+		return maxBedrooms;
+	}
+
 	/* This method will wait for an element until the visibility of Element is Located or time out exception occurs
 	 * @param driver
 	 * @param by
 	 * throws TimeoutException
 	 * @return element
 	 * */
-	public WebElement wait(WebDriver driver, By by) throws TimeoutException {
+	public final WebElement wait(WebDriver driver, By by) throws TimeoutException {
 		WebDriverWait wait = new WebDriverWait(driver, 20);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(by));
 		WebElement element = driver.findElement(by);
 		return element;
 	}
 
-// TODO : Tried to use FluentWait but couldn't fully complete to work.
+	// TODO : Tried to use FluentWait but couldn't fully complete to work.
 	public Wait<WebDriver> getWait(final WebDriver driver) {
 		// 30 seconds to wait
 		Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
